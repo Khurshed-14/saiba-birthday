@@ -6,6 +6,17 @@
     <title>Saiba's Birthday Countdown</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --card-bg: rgba(255, 255, 255, 0.82);
+            --accent: #d81b60;
+            --accent-soft: #7b1fa2;
+            --sky-top: #82d4ff;
+            --sky-mid: #bdefff;
+            --sky-bottom: #fff5cf;
+            --field-top: #a1e67e;
+            --field-bottom: #71bf50;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -16,11 +27,16 @@
             background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
             font-family: 'Montserrat', sans-serif;
             overflow: hidden;
+            transition: background 900ms ease;
+        }
+
+        body.celebration-active {
+            background: #bfe9ff;
         }
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--card-bg);
             padding: 3rem;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -29,19 +45,26 @@
             z-index: 1;
             max-width: 90%;
             box-sizing: border-box;
+            transition: opacity 450ms ease, transform 450ms ease;
+        }
+
+        .container.hidden {
+            opacity: 0;
+            transform: scale(0.93);
+            pointer-events: none;
         }
 
         h1 {
             font-family: 'Dancing Script', cursive;
             font-size: 3.5rem;
-            color: #d81b60;
+            color: var(--accent);
             margin-bottom: 0.5rem;
             margin-top: 0;
         }
 
         p {
             font-size: 1.1rem;
-            color: #7b1fa2;
+            color: var(--accent-soft);
             margin-bottom: 2rem;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -86,13 +109,6 @@
             font-weight: bold;
         }
 
-        .finished-text {
-            font-family: 'Dancing Script', cursive;
-            font-size: 2.5rem;
-            color: #d81b60;
-            margin: 0;
-        }
-
         /* Floating Decoration */
         .confetti {
             position: absolute;
@@ -104,14 +120,420 @@
             animation: fall 4s linear infinite;
         }
 
+        .celebration-active .confetti {
+            opacity: 0;
+        }
+
         @keyframes fall {
             to {
                 transform: translateY(110vh) rotate(720deg);
             }
         }
 
+        #celebration-scene {
+            position: fixed;
+            inset: 0;
+            display: none;
+            overflow: hidden;
+            z-index: 5;
+            background:
+                radial-gradient(ellipse at 18% 18%, rgba(255, 255, 255, 0.66) 0 13%, transparent 14%),
+                radial-gradient(ellipse at 24% 20%, rgba(255, 255, 255, 0.54) 0 11%, transparent 12%),
+                radial-gradient(ellipse at 74% 16%, rgba(255, 255, 255, 0.64) 0 12%, transparent 13%),
+                radial-gradient(ellipse at 68% 19%, rgba(255, 255, 255, 0.52) 0 10%, transparent 11%),
+                linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 46%, var(--sky-bottom) 78%, #fff3cc 100%);
+        }
+
+        #celebration-scene.active {
+            display: block;
+            animation: scene-reveal 950ms ease-out both;
+        }
+
+        @keyframes scene-reveal {
+            from {
+                opacity: 0;
+                transform: scale(1.03);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .sky-message {
+            position: absolute;
+            top: 8vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            text-align: center;
+            padding: 0 1rem;
+            box-sizing: border-box;
+            color: #ffffff;
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2.2rem, 7vw, 5.4rem);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow:
+                0 2px 0 rgba(44, 99, 140, 0.48),
+                0 0 12px rgba(255, 255, 255, 0.92),
+                0 9px 18px rgba(32, 86, 126, 0.22);
+            z-index: 12;
+            animation: glow 2.8s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%,
+            100% {
+                text-shadow:
+                    0 2px 0 rgba(44, 99, 140, 0.48),
+                    0 0 12px rgba(255, 255, 255, 0.92),
+                    0 9px 18px rgba(32, 86, 126, 0.22);
+            }
+            50% {
+                text-shadow:
+                    0 2px 0 rgba(44, 99, 140, 0.56),
+                    0 0 16px rgba(255, 255, 255, 1),
+                    0 0 26px rgba(255, 232, 185, 0.68),
+                    0 9px 20px rgba(32, 86, 126, 0.22);
+            }
+        }
+
+        .field {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 45vh;
+            background: linear-gradient(180deg, var(--field-top) 0%, var(--field-bottom) 100%);
+            border-top-left-radius: 46% 14%;
+            border-top-right-radius: 46% 14%;
+            z-index: 3;
+        }
+
+        .field::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 16% 80%, rgba(41, 119, 40, 0.42) 0 22%, transparent 23%),
+                radial-gradient(circle at 48% 74%, rgba(38, 106, 37, 0.38) 0 24%, transparent 25%),
+                radial-gradient(circle at 76% 82%, rgba(42, 121, 43, 0.4) 0 20%, transparent 21%);
+            opacity: 0.36;
+        }
+
+        .sunflower-field {
+            position: absolute;
+            inset: auto 0 4vh;
+            height: 32vh;
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        .sunflower {
+            position: absolute;
+            left: var(--x);
+            bottom: 0;
+            width: 88px;
+            height: 190px;
+            transform: translateX(-50%) scale(var(--scale));
+            transform-origin: center bottom;
+            animation: sway 3.8s ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes sway {
+            0%,
+            100% {
+                transform: translateX(-50%) rotate(-2.2deg) scale(var(--scale));
+            }
+            50% {
+                transform: translateX(-50%) rotate(2.2deg) scale(var(--scale));
+            }
+        }
+
+        .stem {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 8px;
+            height: 122px;
+            border-radius: 10px;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, #78c740 0%, #3a8726 100%);
+            box-shadow: inset -1px 0 1px rgba(17, 80, 16, 0.4);
+        }
+
+        .leaf {
+            position: absolute;
+            width: 27px;
+            height: 14px;
+            background: linear-gradient(135deg, #89d851 0%, #4f982f 100%);
+            border-radius: 95% 10% 95% 10%;
+            bottom: 56px;
+        }
+
+        .leaf.left {
+            left: calc(50% - 4px);
+            transform: rotate(-38deg);
+        }
+
+        .leaf.right {
+            left: calc(50% - 21px);
+            transform: scaleX(-1) rotate(-38deg);
+            bottom: 78px;
+        }
+
+        .flower-head {
+            position: absolute;
+            left: 50%;
+            bottom: 104px;
+            width: 66px;
+            height: 66px;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            filter: drop-shadow(0 4px 3px rgba(68, 45, 12, 0.28));
+        }
+
+        .flower-head::before {
+            content: "";
+            position: absolute;
+            inset: -11px;
+            border-radius: 50%;
+            background: repeating-conic-gradient(#ffd95d 0 14deg, #f3a92c 14deg 28deg);
+        }
+
+        .flower-head::after {
+            content: "";
+            position: absolute;
+            inset: 13px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #8f602d 0 22%, #613613 23% 68%, #3e220a 69%);
+            box-shadow: inset 0 0 0 2px rgba(45, 25, 8, 0.26);
+        }
+
+        .cow {
+            position: absolute;
+            right: max(4vw, 10px);
+            bottom: 7vh;
+            width: clamp(185px, 24vw, 290px);
+            height: clamp(130px, 18vw, 190px);
+            z-index: 8;
+            animation: cow-bob 2.4s ease-in-out infinite;
+        }
+
+        @keyframes cow-bob {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .cow-body {
+            position: absolute;
+            left: 22%;
+            bottom: 18%;
+            width: 62%;
+            height: 48%;
+            background: #fffdf7;
+            border: 4px solid #1f2f40;
+            border-radius: 55px 56px 42px 42px;
+            box-sizing: border-box;
+        }
+
+        .spot {
+            position: absolute;
+            background: #334456;
+            border-radius: 48% 52% 57% 43%;
+        }
+
+        .spot.one {
+            width: 22%;
+            height: 30%;
+            left: 18%;
+            top: 30%;
+        }
+
+        .spot.two {
+            width: 16%;
+            height: 24%;
+            left: 48%;
+            top: 18%;
+        }
+
+        .spot.three {
+            width: 20%;
+            height: 26%;
+            left: 66%;
+            top: 48%;
+        }
+
+        .cow-head {
+            position: absolute;
+            left: 2%;
+            bottom: 30%;
+            width: 34%;
+            height: 40%;
+            background: #fffdf7;
+            border: 4px solid #1f2f40;
+            border-radius: 46% 44% 50% 52%;
+            box-sizing: border-box;
+        }
+
+        .cow-ear {
+            position: absolute;
+            top: -14%;
+            width: 24%;
+            height: 30%;
+            background: #ffe8cb;
+            border: 3px solid #1f2f40;
+            border-radius: 60% 40% 60% 30%;
+            box-sizing: border-box;
+        }
+
+        .cow-ear.left {
+            left: 6%;
+            transform: rotate(-18deg);
+        }
+
+        .cow-ear.right {
+            right: 8%;
+            transform: scaleX(-1) rotate(-18deg);
+        }
+
+        .cow-eye {
+            position: absolute;
+            top: 34%;
+            width: 9%;
+            height: 9%;
+            background: #1f2f40;
+            border-radius: 50%;
+        }
+
+        .cow-eye.left {
+            left: 31%;
+        }
+
+        .cow-eye.right {
+            right: 24%;
+        }
+
+        .cow-snout {
+            position: absolute;
+            left: 20%;
+            bottom: 7%;
+            width: 62%;
+            height: 42%;
+            border-radius: 46% 46% 52% 52%;
+            background: radial-gradient(circle at 50% 28%, #ffe8de 0%, #ffd5c8 58%, #ffc4b5 100%);
+            border: 3px solid #1f2f40;
+            border-top: 0;
+            box-shadow: inset 0 -3px 0 rgba(191, 115, 104, 0.34);
+            box-sizing: border-box;
+        }
+
+        .cow-nostril {
+            position: absolute;
+            top: 36%;
+            width: 12%;
+            height: 20%;
+            background: #7f4a4a;
+            border-radius: 50%;
+            box-shadow: inset 0 1px 1px rgba(53, 27, 27, 0.4);
+        }
+
+        .cow-nostril.left {
+            left: 22%;
+            transform: rotate(15deg);
+        }
+
+        .cow-nostril.right {
+            right: 22%;
+            transform: rotate(-15deg);
+        }
+
+        .cow-smile {
+            position: absolute;
+            left: 28%;
+            bottom: 14%;
+            width: 44%;
+            height: 24%;
+            border-bottom: 3px solid #7a4533;
+            border-radius: 0 0 28px 28px;
+        }
+
+        .cow-leg {
+            position: absolute;
+            bottom: 0;
+            width: 10%;
+            height: 26%;
+            background: #fffdf7;
+            border: 3px solid #1f2f40;
+            border-bottom: 6px solid #1f2f40;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .cow-leg.one {
+            left: 30%;
+        }
+
+        .cow-leg.two {
+            left: 44%;
+        }
+
+        .cow-leg.three {
+            left: 64%;
+        }
+
+        .cow-leg.four {
+            left: 78%;
+        }
+
+        .cow-tail {
+            position: absolute;
+            left: 20%;
+            bottom: 48%;
+            width: 13%;
+            height: 24%;
+            border-left: 4px solid #1f2f40;
+            border-bottom: 4px solid #1f2f40;
+            border-radius: 0 0 0 16px;
+            transform: rotate(-18deg);
+        }
+
+        .cow-tail::after {
+            content: "";
+            position: absolute;
+            left: -8px;
+            bottom: -8px;
+            width: 13px;
+            height: 13px;
+            background: #1f2f40;
+            border-radius: 50%;
+        }
+
+        #fireworks-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9;
+            opacity: 0;
+            transition: opacity 700ms ease;
+            clip-path: inset(0 0 36% 0);
+        }
+
+        body.show-fireworks #fireworks-canvas {
+            opacity: 1;
+        }
+
         /* --- MOBILE RESPONSIVENESS --- */
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
             .container {
                 padding: 2rem 1rem;
                 width: 95%;
@@ -148,25 +570,34 @@
                 font-size: 0.65rem; /* scales down the text below numbers */
             }
 
-            .finished-text {
-                font-size: 2rem;
+            .sky-message {
+                top: 9vh;
+                font-size: clamp(2rem, 10vw, 3.6rem);
+            }
+
+            .field {
+                height: 50vh;
+                border-top-left-radius: 52% 14%;
+                border-top-right-radius: 52% 14%;
+            }
+
+            .sunflower-field {
+                inset: auto 0 3vh;
+                height: 34vh;
+            }
+
+            .cow {
+                right: 1vw;
+                bottom: 5.5vh;
+                width: 172px;
+                height: 128px;
             }
         }
     </style>
 </head>
 <body>
 
-    <script>
-        // Generate Confetti
-        for (let i = 0; i < 20; i++) {
-            let confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            confetti.style.backgroundColor = ['#f48fb1', '#ce93d8', '#81d4fa', '#ffcc80'][Math.floor(Math.random() * 4)];
-            document.body.appendChild(confetti);
-        }
-    </script>
+    <canvas id="fireworks-canvas"></canvas>
 
     <div class="container">
         <h1>For Saiba</h1>
@@ -194,18 +625,182 @@
         </div>
     </div>
 
+    <div id="celebration-scene" aria-hidden="true">
+        <div class="sky-message">Happy Birthday to Saiba</div>
+        <div class="field"></div>
+        <div class="sunflower-field" id="sunflower-field"></div>
+
+        <div class="cow" role="img" aria-label="A smiling cow in the sunflower field">
+            <div class="cow-body">
+                <div class="spot one"></div>
+                <div class="spot two"></div>
+                <div class="spot three"></div>
+            </div>
+            <div class="cow-head">
+                <div class="cow-ear left"></div>
+                <div class="cow-ear right"></div>
+                <div class="cow-eye left"></div>
+                <div class="cow-eye right"></div>
+                <div class="cow-snout">
+                    <div class="cow-nostril left"></div>
+                    <div class="cow-nostril right"></div>
+                    <div class="cow-smile"></div>
+                </div>
+            </div>
+            <div class="cow-tail"></div>
+            <div class="cow-leg one"></div>
+            <div class="cow-leg two"></div>
+            <div class="cow-leg three"></div>
+            <div class="cow-leg four"></div>
+        </div>
+    </div>
+
     <script>
+        // Generate floating confetti during countdown mode.
+        for (let i = 0; i < 20; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            confetti.style.backgroundColor = ['#f48fb1', '#ce93d8', '#81d4fa', '#ffcc80'][Math.floor(Math.random() * 4)];
+            document.body.appendChild(confetti);
+        }
+
+        const container = document.querySelector('.container');
+        const celebrationScene = document.getElementById('celebration-scene');
+        const sunflowerField = document.getElementById('sunflower-field');
+        const fireworksCanvas = document.getElementById('fireworks-canvas');
+        const fireworksCtx = fireworksCanvas.getContext('2d');
+
+        const particles = [];
+        let fireworksAnimationId = null;
+        let fireworksSpawnerId = null;
+        let hasCelebrated = false;
+
+        function resizeFireworksCanvas() {
+            fireworksCanvas.width = window.innerWidth;
+            fireworksCanvas.height = window.innerHeight;
+        }
+
+        function buildSunflowerField() {
+            if (sunflowerField.childElementCount > 0) {
+                return;
+            }
+
+            const flowerCount = window.innerWidth <= 700 ? 10 : 16;
+
+            for (let i = 0; i < flowerCount; i++) {
+                const flower = document.createElement('div');
+                const basePosition = ((i + 1) / (flowerCount + 1)) * 100;
+                const x = Math.max(3, Math.min(97, basePosition + (Math.random() * 4 - 2)));
+
+                flower.className = 'sunflower';
+                flower.style.setProperty('--x', `${x.toFixed(2)}%`);
+                flower.style.setProperty('--scale', (0.72 + Math.random() * 0.58).toFixed(2));
+                flower.style.setProperty('--delay', `${(Math.random() * 2.4).toFixed(2)}s`);
+                flower.innerHTML = '<div class="stem"></div><div class="leaf left"></div><div class="leaf right"></div><div class="flower-head"></div>';
+                sunflowerField.appendChild(flower);
+            }
+        }
+
+        function createFireworkBurst(x, y) {
+            const colors = ['#ffd95d', '#ff7b89', '#7df0ff', '#ffffff', '#ffa8ec', '#a1ff8d'];
+            const count = 40;
+
+            for (let i = 0; i < count; i++) {
+                const angle = ((Math.PI * 2) / count) * i + Math.random() * 0.08;
+                const speed = 1 + Math.random() * 2.5;
+
+                particles.push({
+                    x,
+                    y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 0,
+                    maxLife: 46 + Math.random() * 24,
+                    size: 1 + Math.random() * 1.1,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+        }
+
+        function spawnRandomFirework() {
+            const x = fireworksCanvas.width * (0.15 + Math.random() * 0.7);
+            const y = fireworksCanvas.height * (0.06 + Math.random() * 0.24);
+            createFireworkBurst(x, y);
+        }
+
+        function drawFireworks() {
+            if (!hasCelebrated) {
+                return;
+            }
+
+            fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.vy += 0.045;
+                particle.vx *= 0.99;
+                particle.life += 1;
+
+                const alpha = 1 - particle.life / particle.maxLife;
+                if (alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                fireworksCtx.globalAlpha = alpha;
+                fireworksCtx.fillStyle = particle.color;
+                fireworksCtx.beginPath();
+                fireworksCtx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                fireworksCtx.fill();
+            }
+
+            fireworksCtx.globalAlpha = 1;
+            fireworksAnimationId = requestAnimationFrame(drawFireworks);
+        }
+
+        function startFireworks() {
+            if (fireworksSpawnerId !== null || fireworksAnimationId !== null) {
+                return;
+            }
+
+            fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+            spawnRandomFirework();
+            spawnRandomFirework();
+            fireworksSpawnerId = setInterval(spawnRandomFirework, 900);
+            drawFireworks();
+        }
+
+        function launchCelebration() {
+            if (hasCelebrated) {
+                return;
+            }
+
+            hasCelebrated = true;
+            container.classList.add('hidden');
+            celebrationScene.classList.add('active');
+            celebrationScene.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('celebration-active', 'show-fireworks');
+
+            buildSunflowerField();
+            startFireworks();
+        }
+
         // Set the target date: April 11, 2026 at 00:00:00 GMT+6
         const targetDate = new Date("2026-04-11T00:00:00+06:00").getTime();
+        let timerInterval;
 
-        const timerInterval = setInterval(function() {
+        function updateCountdown() {
             const now = new Date().getTime();
             const distance = targetDate - now;
 
             // When the countdown is over
-            if (distance < 0) {
+            if (distance <= 0) {
                 clearInterval(timerInterval);
-                document.getElementById("custom-countdown").innerHTML = "<h2 class='finished-text'>Happy Birthday Saiba!</h2>";
+                launchCelebration();
                 return;
             }
 
@@ -220,7 +815,13 @@
             document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
             document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
             document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
-        }, 1000);
+        }
+
+        resizeFireworksCanvas();
+        window.addEventListener('resize', resizeFireworksCanvas);
+
+        updateCountdown();
+        timerInterval = setInterval(updateCountdown, 1000);
     </script>
 
 </body>
